@@ -4,15 +4,13 @@ import {
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
 import { monthLabel, monthRange } from '../engine/seed';
-import { formatINR, getEntry, getOverspends, monthTotals } from '../engine/finance';
+import { formatINR, getEntry, getOverspends, monthInflow, monthTotals, savingsSummary } from '../engine/finance';
 import type { FinanceState } from '../engine/types';
 
 interface Props {
@@ -30,6 +28,7 @@ function axisFmt(v: number): string {
 export default function Dashboard({ state, month, setMonth }: Props) {
   const totals = monthTotals(state, month);
   const overs = getOverspends(state, month);
+  const sav = savingsSummary(state, month);
 
   const barData = state.categories
     .filter((c) => {
@@ -45,7 +44,7 @@ export default function Dashboard({ state, month, setMonth }: Props) {
 
   const trendData = monthRange(month, 6).map((m) => {
     const t = monthTotals(state, m);
-    return { month: monthLabel(m), Spent: t.totalActual, Budget: t.totalBudget };
+    return { month: monthLabel(m), Inflow: monthInflow(state, m), Outflow: t.totalActual };
   });
 
   const cards = [
@@ -80,6 +79,29 @@ export default function Dashboard({ state, month, setMonth }: Props) {
             </p>
           </div>
         ))}
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-400">Inflow</p>
+          <p className="text-xl font-bold tabular-nums text-emerald-600">₹{formatINR(sav.inflow)}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-400">Outflow</p>
+          <p className="text-xl font-bold tabular-nums text-slate-900">₹{formatINR(sav.outflow)}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-400">Net saved</p>
+          <p className={`text-xl font-bold tabular-nums ${sav.net < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+            ₹{formatINR(sav.net)}
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-400">Savings rate</p>
+          <p className="text-xl font-bold tabular-nums text-slate-900">
+            {sav.rate != null ? `${sav.rate.toFixed(1)}%` : '—'}
+          </p>
+        </div>
       </div>
 
       {overs.length > 0 && (
@@ -119,17 +141,17 @@ export default function Dashboard({ state, month, setMonth }: Props) {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-2 text-sm font-semibold">6-month spend trend</p>
+        <p className="mb-2 text-sm font-semibold">6-month inflow vs outflow</p>
         <ResponsiveContainer width="100%" height={220}>
-          <LineChart data={trendData} margin={{ left: 0, right: 8 }}>
+          <BarChart data={trendData} margin={{ left: 0, right: 8 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" tick={{ fontSize: 11 }} />
             <YAxis tickFormatter={axisFmt} tick={{ fontSize: 11 }} width={44} />
             <Tooltip formatter={(v: number | undefined) => `₹${formatINR(v ?? 0)}`} />
             <Legend />
-            <Line type="monotone" dataKey="Spent" stroke="#4f46e5" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="Budget" stroke="#94a3b8" strokeDasharray="5 5" dot={false} />
-          </LineChart>
+            <Bar dataKey="Inflow" fill="#059669" />
+            <Bar dataKey="Outflow" fill="#dc2626" />
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>

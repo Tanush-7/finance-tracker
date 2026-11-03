@@ -1,13 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import Enter from './components/Enter';
+import Inflows from './components/Inflows';
 import Investments from './components/Investments';
+import Plan from './components/Plan';
+import Subscriptions from './components/Subscriptions';
 import Tags from './components/Tags';
+import Transactions from './components/Transactions';
 import { currentMonthKey } from './engine/seed';
 import { exportJSON, importJSON, loadState, saveState } from './engine/store';
 import type { FinanceState } from './engine/types';
 
-const TABS = ['Enter', 'Dashboard', 'Investments', 'Tags'] as const;
+const TABS = ['Enter', 'Dashboard', 'Inflows', 'Investments', 'Transactions', 'Subscriptions', 'Plan', 'Tags'] as const;
 type Tab = (typeof TABS)[number];
 
 export default function App() {
@@ -81,12 +85,12 @@ export default function App() {
             />
           </div>
         </div>
-        <nav className="mx-auto flex max-w-3xl gap-1 px-4 pb-3">
+        <nav className="mx-auto flex max-w-3xl gap-1 overflow-x-auto px-4 pb-3">
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 rounded-lg px-2 py-2 text-sm font-medium ${
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${
                 tab === t ? 'bg-white text-slate-900' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
@@ -99,9 +103,13 @@ export default function App() {
       <main className="mx-auto max-w-3xl px-4 py-4">
         {tab === 'Enter' && <Enter state={state} month={month} setMonth={setMonth} update={update} />}
         {tab === 'Dashboard' && <Dashboard state={state} month={month} setMonth={setMonth} />}
+        {tab === 'Inflows' && <Inflows state={state} month={month} setMonth={setMonth} update={update} />}
         {tab === 'Investments' && (
           <Investments state={state} month={month} setMonth={setMonth} update={update} />
         )}
+        {tab === 'Transactions' && <Transactions state={state} update={update} />}
+        {tab === 'Subscriptions' && <Subscriptions state={state} update={update} />}
+        {tab === 'Plan' && <Plan state={state} month={month} setMonth={setMonth} update={update} />}
         {tab === 'Tags' && <Tags state={state} />}
       </main>
 
