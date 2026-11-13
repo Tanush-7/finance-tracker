@@ -1,26 +1,26 @@
 import type { Category, FinanceState, Fund, InflowSource, PlanBucket, PlanConfig, Subscription } from './types';
 
-// Budget config seeded from the "Finances 2" Google Sheet (Monthly budget tab).
-// null = no budget set in the sheet (tracked spend only).
+// Example budget defaults for a fresh install - replace them with your own.
+// null = no example budget (tracked spend only).
 
 const CATEGORIES: Array<[string, string, number | null]> = [
-  ['sip', 'SIP', 15000],
+  ['sip', 'SIP', 10000],
   ['stocks', 'Stocks', 0],
   ['gold', 'Gold', 0],
-  ['car-emi', 'Car EMI', 15189],
-  ['bike-emi', 'Bike EMI', 5782],
+  ['car-emi', 'Car EMI', 12000],
+  ['bike-emi', 'Bike EMI', 4000],
   ['tv-emi', 'TV EMI', null],
   ['bills', 'Bills', 5000],
   ['credit-card', 'Credit Card', null],
-  ['groceries', 'Groceries', 4000],
-  ['travel', 'Travel', 4000],
-  ['insurance', 'Insurance', 5000],
-  ['fitness', 'Fitness', 7000],
-  ['swimming', 'Swimming', 5000],
-  ['protein', 'Protein', 2500],
-  ['shopping', 'Shopping', 3000],
+  ['groceries', 'Groceries', 6000],
+  ['travel', 'Travel', 5000],
+  ['insurance', 'Insurance', 3000],
+  ['fitness', 'Fitness', 3000],
+  ['swimming', 'Swimming', 2000],
+  ['protein', 'Protein', 2000],
+  ['shopping', 'Shopping', 4000],
   ['entertainment', 'Entertainment', 2000],
-  ['goals', 'Goals', 100000],
+  ['goals', 'Goals', 20000],
   ['donation', 'Donation', null],
   ['misc', 'Misc', null],
 ];
@@ -89,18 +89,18 @@ export function toISODate(d: Date): string {
 }
 
 /**
- * One planned/example subscription so the tab isn't empty. NOT a real charge —
- * T hasn't bought it yet; he edits or deletes it.
+ * One example subscription so the tab isn't empty on a fresh install.
+ * Edit or delete it - it is not a real charge.
  */
 export function seedSubscriptions(): Subscription[] {
   const renewal = new Date();
   renewal.setDate(renewal.getDate() + 30);
   return [
     {
-      id: 'claude-pro-planned',
-      name: 'Claude Pro (planned)',
-      category: 'AI',
-      amount: 1950,
+      id: 'example-subscription',
+      name: 'Example subscription',
+      category: 'Apps',
+      amount: 500,
       cycle: 'monthly',
       renewalDate: toISODate(renewal),
       status: 'trial',
@@ -115,9 +115,8 @@ export function currentMonthKey(d: Date = new Date()): string {
 }
 
 /**
- * Plan defaults: 50/30/20 split, take-home prefilled from ₹17.5L fixed / 12
- * (pre-tax — T edits to his actual take-home), bucket classification seeded
- * from his 19 categories.
+ * Plan defaults: 50/30/20 split with a round example take-home.
+ * Edit it to your actual take-home; buckets cover the default categories.
  */
 export function seedPlan(): PlanConfig {
   const buckets: Record<string, PlanBucket> = {
@@ -142,7 +141,7 @@ export function seedPlan(): PlanConfig {
     goals: 'save',
   };
   return {
-    takeHome: 145833,
+    takeHome: 100000,
     needsPct: 50,
     wantsPct: 30,
     savePct: 20,
