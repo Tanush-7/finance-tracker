@@ -75,9 +75,10 @@ after the page loads.
 
 All data stays in this browser's `localStorage`. Nothing is sent anywhere.
 
-## Seed from sheet (manual, v1)
+## Example defaults
 
-Budgets are seeded from the "Finances 2" Google Sheet (Monthly budget tab).
+A fresh install ships with round-number example budgets and an example
+take-home so the tabs are not empty - replace them with your own.
 Monthly actuals are entered by hand in the app. There is no automatic sync.
 
 ## Roadmap
