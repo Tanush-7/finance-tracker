@@ -57,12 +57,12 @@ describe('getOverspends', () => {
     const over = getOverspends(s, M);
     expect(over).toHaveLength(1);
     expect(over[0].categoryName).toBe('Travel');
-    expect(over[0].over).toBe(2872);
+    expect(over[0].over).toBe(1872); // 6872 actual - 5000 example budget
   });
 
   it('ignores under-budget, equal, and missing actuals', () => {
     let s = seedState();
-    s = setActual(s, M, 'travel', 4000); // equal
+    s = setActual(s, M, 'travel', 5000); // equal
     s = setActual(s, M, 'groceries', 3000); // under
     expect(getOverspends(s, M)).toHaveLength(0);
   });
@@ -75,8 +75,8 @@ describe('getOverspends', () => {
 
   it('sorts by over amount, largest first', () => {
     let s = seedState();
-    s = setActual(s, M, 'travel', 5000); // over by 1000
-    s = setActual(s, M, 'shopping', 8000); // over by 5000
+    s = setActual(s, M, 'travel', 7000); // over by 2000
+    s = setActual(s, M, 'shopping', 8000); // over by 4000
     const over = getOverspends(s, M);
     expect(over[0].categoryName).toBe('Shopping');
     expect(over[1].categoryName).toBe('Travel');
@@ -427,18 +427,18 @@ describe('plan', () => {
   it('computes 50/30/20 envelopes', () => {
     const s = seedState();
     const env = planEnvelopes(s.plan);
-    expect(env.needs).toBeCloseTo(72916.5, 1);
-    expect(env.wants).toBeCloseTo(43749.9, 1);
-    expect(env.save).toBeCloseTo(29166.6, 1);
+    expect(env.needs).toBeCloseTo(50000, 1);
+    expect(env.wants).toBeCloseTo(30000, 1);
+    expect(env.save).toBeCloseTo(20000, 1);
   });
 
   it('flags buckets over envelope', () => {
     const s = seedState();
     const info = planBucketInfo(s, s.plan);
     const save = info.find((b) => b.bucket === 'save')!;
-    // SIP 15000 + Goals 100000 budgets > 29166 save envelope.
+    // SIP 10000 + Goals 20000 example budgets > 20000 save envelope.
     expect(save.over).toBe(true);
-    expect(save.budgeted).toBe(115000);
+    expect(save.budgeted).toBe(30000);
   });
 
   it('emergency target is 6x monthly outflow', () => {
@@ -454,9 +454,9 @@ describe('plan', () => {
     let s = seedState();
     const ok = emiCheck(s, s.plan, M);
     expect(ok.over).toBe(false);
-    expect(ok.total).toBe(15189 + 5782);
-    const tight = emiCheck(s, { ...s.plan, takeHome: 40000 }, M);
+    expect(ok.total).toBe(12000 + 4000);
+    const tight = emiCheck(s, { ...s.plan, takeHome: 30000 }, M);
     expect(tight.over).toBe(true);
-    expect(tight.ratioPct).toBeCloseTo(52.4, 1);
+    expect(tight.ratioPct).toBeCloseTo(53.3, 1);
   });
 });
