@@ -71,7 +71,7 @@ export default function Plan({ state, month, setMonth, update }: Props) {
           </div>
         </label>
         <p className="mt-1 text-xs text-slate-500">
-          Prefilled from ₹17.5L fixed ÷ 12 (pre-tax). Edit to your actual take-home.
+          Example starting figure. Edit it to your actual take-home.
         </p>
       </div>
 
